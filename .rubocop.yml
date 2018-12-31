@@ -1,0 +1,11 @@
+AllCops:
+  Exclude:
+    - 'vendor/**/*'
+
+Metrics/BlockLength:
+  Exclude:
+    - '*.gemspec'
+    - 'spec/**/*'
+
+Style/Documentation:
+  Enabled: false
