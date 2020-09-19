@@ -1,38 +1,36 @@
+# frozen_string_literal: true
+
 require 'faraday'
 require 'json'
 
 module Rupology
   class Client
-    DEFAULT_URL = 'https://repology.org'.freeze
+    DEFAULT_URL = 'https://repology.org'
 
     def initialize(url = DEFAULT_URL)
       @connection = Faraday.new(url: url)
     end
 
-    def metapackage(package)
+    def project(package)
       response = @connection.get do |request|
-        request.url('/api/v1/metapackage/' + package)
+        request.url('/api/v1/project/' + package)
       end
       JSON.parse(response.body)
     end
 
-    def metapackages(pivot_package, up_to = false)
+    def projects(pivot_package, params = {}, up_to = false)
       response = @connection.get do |request|
         pivot_package = '..' + pivot_package if up_to
-        request.url('/api/v1/metapackages/' + pivot_package + '/')
-      end
-      JSON.parse(response.body)
-    end
-
-    def filter(params = {})
-      response = @connection.get do |request|
-        request.url('/api/v1/metapackages/')
+        pivot_package += '/' unless pivot_package.empty?
+        request.url('/api/v1/projects/' + pivot_package)
         request.params = params
       end
       JSON.parse(response.body)
     end
 
     def problems(type, key, params = {})
+      raise ArgumentError, "type should be 'repository' or 'maintainer'" unless %w[repository maintainer].include?(type)
+
       response = @connection.get do |request|
         request.url('/api/v1/' + type + '/' + key + '/problems')
         request.params = params

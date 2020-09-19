@@ -1,22 +1,30 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'rupology/client'
 
 describe Rupology::Client do
-  it 'gets metapackage' do
+  it 'gets project' do
     client = Rupology::Client.new
-    response = client.metapackage('ruby')
-    expect(response[0]['name']).to start_with 'ruby'
+    response = client.project('ruby')
+    expect(response[0]['binname']).to include 'ruby'
   end
 
-  it 'gets metapackages' do
+  it 'gets projects' do
     client = Rupology::Client.new
-    response = client.metapackages('ruby')
+    response = client.projects('ruby')
     expect(response['ruby']).not_to be_nil
   end
 
-  it 'gets metapackages (up to)' do
+  it 'gets projects (up to)' do
     client = Rupology::Client.new
-    response = client.metapackages('ruby', true)
+    response = client.projects('ruby', {}, true)
+    expect(response['ruby']).not_to be_nil
+  end
+
+  it 'gets projects (search)' do
+    client = Rupology::Client.new
+    response = client.projects('', { search: 'ruby' })
     expect(response['ruby']).not_to be_nil
   end
 
@@ -26,16 +34,14 @@ describe Rupology::Client do
     expect(response[0]['repo']).to eq 'freebsd'
   end
 
-  it 'filters 010editor' do
-    client = Rupology::Client.new
-    responce = client.filter(search: '010editor')
-    expect(responce['010editor']).not_to be_nil
-    expect(responce.length).to be 1
-  end
-
   it 'gets maintainer problems' do
     client = Rupology::Client.new
     response = client.problems('maintainer', 'ports@freebsd.org')
     expect(response[0]['maintainers']).to include 'ports@freebsd.org'
+  end
+
+  it 'gets invalid problems' do
+    client = Rupology::Client.new
+    expect { client.problems('invalid', 'invalid') }.to raise_error(ArgumentError)
   end
 end

@@ -25,7 +25,7 @@ require 'rupology/client'
 
 client = Rupology::Client.new
 
-result = client.metapackage('ruby')
+result = client.project('ruby')
 
 p result[0]['name'] # 'ruby2.5'
 ```
